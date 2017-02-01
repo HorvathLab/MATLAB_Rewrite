@@ -24,7 +24,6 @@ def data_window(chrm, vaf):
         pos += segment_length
         segment_vafs = segment_vafs[segment_vafs['POS'] < pos]
         wdw_variants_num.append(len(segment_vafs))
-    print wdw_variants_num
     return wdw_variants_num
 
 def adaptive_window(chrm, vaf):
@@ -43,7 +42,6 @@ def adaptive_window(chrm, vaf):
         else:
             wdw_variants_num.append(data_wdw_variants_num[i])
             i += 1
-    print wdw_variants_num
     return wdw_variants_num
 
 vaf = read_data.getData()
