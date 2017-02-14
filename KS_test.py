@@ -1,47 +1,51 @@
-import pandas
-import read_data
 import find_window
-import scipy
+import read_data
+from collections import Counter
+import scipy.stats
 
-def get_distribution(vaf_wdw, type):
-    type_vaf = pandas.DataFrame(columns=[type])
-    type_vaf.loc[:,type] = vaf_wdw.loc[:,type].astype(float)
-    type_vaf.loc[:,'folded'] = type_vaf.loc[:,(type)] - 0.5
-    type_vaf.loc[:,'folded'] = type_vaf.loc[:,'folded'].abs().round(2)
-    # type_vaf = type_vaf.sort_values(by = 'folded', ascending = 1)
-    # print type_vaf
-    count_vaf = type_vaf.groupby('folded').count()
-    return count_vaf[type].idxmax()
+vaf_list = ['tex', 'ttr', 'nex', 'ntr']
 
-vaf = read_data.getData()
-wdw_variants_num = find_window.adaptive_window(1, vaf)
-# get_distribution(vaf, 'Tex')
+def get_distribution(vaf_wdw, vaf):
+    variant_in_wdw = vaf_wdw.variants
+    vaf_distance = [round(abs(getattr(v, vaf) - 0.5), 2) for v in variant_in_wdw]
+    mode = Counter(vaf_distance).most_common()
+    i = 0
+    maxima = [mode[0][0]]
+    while True:
+        if mode[i][1] == mode[i + 1][1]:
+            maxima.append(mode[i + 1][0])
+            i += 1
+        else:
+            return min(maxima)
+            break
 
-def distribution_chromosome(vaf, wdw_variants_num, type):
-    start = 0
-    end = 0
-    max_dis = list()
-    for l in wdw_variants_num:
-        end = start + l
-        vaf_wdw = vaf[start:end]
-        start += l
-        max_dis.append(get_distribution(vaf_wdw, type))
-    return max_dis
+def distribution_chromosome(chrm, vaf):
+    all_windows = chrm.windows
+    for w in all_windows:
+        setattr(w, 'mode_' + vaf, get_distribution(w, vaf))
+    return
 
-Tex_max = distribution_chromosome(vaf, wdw_variants_num, 'Tex')
-Ttr_max = distribution_chromosome(vaf, wdw_variants_num, 'Ttr')
-
-def mode_difference(max_dis):
-    grouping = [[], []]
+def mode_difference(chrm, vaf):
+    max_dis = [getattr(w, 'mode_' + vaf) for w in chrm.windows]
     maxr = max(max_dis)
     minr = min(max_dis)
-    for index, value in enumerate(max_dis):
-        if value <= (maxr + minr)/2:
-            grouping[0].append(index+1)
+    for w in chrm.windows:
+        if getattr(w, 'mode_' + vaf) <= (maxr + minr)/2:
+            w.group = 0
+            setattr(w, 'group_' + vaf, 0)
         else:
-            grouping[1].append(index+1)
-    print grouping
-    return grouping
+            setattr(w, 'group_' + vaf, 1)
+    return
 
-mode_difference(Tex_max)
-mode_difference(Ttr_max)
+allVariants = read_data.getAllVariants()
+chrm = find_window.assign_window(allVariants, 'adaptive')
+for vaf in vaf_list:
+    distribution_chromosome(chrm, vaf)
+    mode_difference(chrm, vaf)
+
+group_variants = chrm.join_groups('tex')
+
+data1 = [v.nex for v in group_variants[0]]
+data2 = [v.ntr for v in group_variants[0]]
+p_value = scipy.stats.ks_2samp(data1, data2)
+print p_value
