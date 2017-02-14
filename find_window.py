@@ -56,11 +56,9 @@ def assign_window(allVariants, type):
     else:
         raise ValueError('%s is not invalid. Please enter data/position/adaptive as type' % type)
     start = 0
-    print wdw_variants_num
     for w in wdw_variants_num:
         window = chromosome.window()
         end = start + w
-        print start, end
         window.variants = allVariants[start:end]
         chrm.windows.append(window)
         start += w
