@@ -1,28 +1,24 @@
 import find_window
 import read_data
+import numpy as np
 from collections import Counter
 import scipy.stats
 
-vaf_list = ['tex', 'ttr', 'nex', 'ntr']
-
 def get_distribution(vaf_wdw, vaf):
     variant_in_wdw = vaf_wdw.variants
-    vaf_distance = [round(abs(getattr(v, vaf) - 0.5), 2) for v in variant_in_wdw]
-    mode = Counter(vaf_distance).most_common()
-    i = 0
-    maxima = [mode[0][0]]
-    while True:
-        if mode[i][1] == mode[i + 1][1]:
-            maxima.append(mode[i + 1][0])
-            i += 1
-        else:
-            return min(maxima)
-            break
+    vaf_distance = [round(abs(getattr(v, vaf)  - 0.5), 2) for v in variant_in_wdw]
+    bins = np.linspace(0, 0.5, num = 51)
+    hist = np.histogram(vaf_distance, bins=bins)
+    idx = np.argmax(hist[0])
+    return round(hist[1][idx], 2)
 
 def distribution_chromosome(chrm, vaf):
     all_windows = chrm.windows
     for w in all_windows:
-        setattr(w, 'mode_' + vaf, get_distribution(w, vaf))
+        if vaf == 'ttr' and get_distribution(w, vaf) == 0.34:
+            setattr(w, 'mode_' + vaf, 0)
+        else:
+            setattr(w, 'mode_' + vaf, get_distribution(w, vaf))
     return
 
 def mode_difference(chrm, vaf):
@@ -36,16 +32,3 @@ def mode_difference(chrm, vaf):
         else:
             setattr(w, 'group_' + vaf, 1)
     return
-
-allVariants = read_data.getAllVariants()
-chrm = find_window.assign_window(allVariants, 'adaptive')
-for vaf in vaf_list:
-    distribution_chromosome(chrm, vaf)
-    mode_difference(chrm, vaf)
-
-group_variants = chrm.join_groups('tex')
-
-data1 = [v.nex for v in group_variants[0]]
-data2 = [v.ntr for v in group_variants[0]]
-p_value = scipy.stats.ks_2samp(data1, data2)
-print p_value
