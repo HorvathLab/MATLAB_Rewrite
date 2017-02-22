@@ -1,6 +1,7 @@
 class chromosome:
     def __init__(self):
         self.windows = list()
+        self.p_values = dict()
 
     def join_groups(self, vaf):
         group = [[], []]
@@ -10,6 +11,12 @@ class chromosome:
             elif getattr(w, 'group_' + vaf):
                 group[1] += w.variants
         return group
+
+    def getAllVariants(self):
+        allVariants = list()
+        for w in self.windows():
+            allVariants += w.variants
+        return allVariants
 
 class window:
     def __init__(self):
