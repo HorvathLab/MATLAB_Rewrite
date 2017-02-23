@@ -3,6 +3,7 @@ import chromosome
 import find_window
 import KS_test
 import scipy
+import emd
 
 bonf_corr = 72*22*2
 sig_level = 0.05/bonf_corr
@@ -121,7 +122,10 @@ def main():
             chrm.p_values['ttrGroup_tex_ttr_bimodal'] = scipy.stats.ks_2samp([v.tex for v in bi_variants_ttr], [v.ttr for v in bi_variants_ttr]).pvalue
 
         #EMD
-
+        for ideal_type in EMD_ideal_tex:
+            ideal = emd.ideal_generator_tex(ideal_type)
+            chrm.emd_tex[ideal_type] = emd.emd(emd.cumsum(texGroup0_tex), emd.cumsum(ideal))
+        print chrm.emd_tex
 
 if __name__ == '__main__':
     main()

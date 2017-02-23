@@ -3,7 +3,7 @@ import numpy
 bins = 100
 max_emd = 1
 
-def ideal_generator(dis_type):
+def ideal_generator_tex(dis_type):
     if dis_type == '0100':
         ideal = numpy.random.beta(0.4, 0.4, 20000)
     else:
@@ -31,8 +31,7 @@ def cumsum(data):
     return numpy.cumsum([float(h)/length for h in counts])
 
 def emd(sample, ideal):
-    emd = sum(abs(sample - ideal)) * (1 / bins) / max_emd
+    sub = [abs(x - y) for x, y in zip(sample, ideal)]
+    print sum(sub)
+    emd = sum(sub) * (1 / float(bins)) / float(max_emd)
     return emd
-
-ideal = ideal_generator('2080')
-print cumsum(ideal)
