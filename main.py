@@ -4,8 +4,11 @@ import find_window
 import KS_test
 import scipy
 
-
+bonf_corr = 72*22*2
+sig_level = 0.05/bonf_corr
 vaf_list = ['nex', 'ntr', 'tex', 'ttr']
+EMD_ideal_tex = ['4555', '3367', '2575', '2080', '0100']
+EMD_ideal_ttr = ['01b', '01n', '5050']
 
 def main():
     chrm = find_window.assign_window(17, read_data.getAllVariants(), 'adaptive')
@@ -64,7 +67,60 @@ def main():
         ttrGroup1_ntr = [v.ntr for v in group_variants_ttr[1]]
         chrm.p_values['ttrGroup1_ttr_ntr'] = scipy.stats.ks_2samp(ttrGroup1_ttr, ttrGroup1_ntr).pvalue
 
-    print chrm.p_values
+    if 'texGroup_tex_nex' in chrm.p_values.keys():
+        if chrm.p_values['texGroup_tex_nex'] < sig_level:
+            chrm.bimodal = [x for x in range(len(chrm.windows))]
+            chrm.unimodal = []
+        else:
+            chrm.unimodal = [x for x in range(len(chrm.windows))]
+            chrm.bimodal = []
+    elif 'texGroup0_tex_nex' in chrm.p_values.keys() and 'texGroup1_tex_nex' in chrm.p_values.keys():
+        grouping_tex = [w.group_tex for w in chrm.windows]
+        chrm.bimodal_tex = list()
+        chrm.unimodal_tex = list()
+        if chrm.p_values['texGroup0_tex_nex'] < sig_level:
+            chrm.bimodal_tex += [i for i,x in enumerate(grouping_tex) if x == 0]
+        else:
+            chrm.unimodal_tex += [i for i,x in enumerate(grouping_tex) if x == 0]
+
+        if chrm.p_values['texGroup1_tex_nex'] < sig_level:
+            chrm.bimodal_tex += [i for i,x in enumerate(grouping_tex) if x == 1]
+        else:
+            chrm.unimodal_tex += [i for i,x in enumerate(grouping_tex) if x == 1]
+
+        grouping_ttr = [w.group_ttr for w in chrm.windows]
+        chrm.bimodal_ttr = list()
+        chrm.unimodal_ttr = list()
+        if chrm.p_values['ttrGroup0_ttr_ntr'] < sig_level:
+            chrm.bimodal_ttr += [i for i,x in enumerate(grouping_ttr) if x == 0]
+        else:
+            chrm.unimodal_ttr += [i for i,x in enumerate(grouping_ttr) if x == 0]
+
+        if chrm.p_values['ttrGroup1_ttr_ntr'] < sig_level:
+            chrm.bimodal_ttr += [i for i,x in enumerate(grouping_ttr) if x == 1]
+        else:
+            chrm.unimodal_ttr += [i for i,x in enumerate(grouping_ttr) if x == 1]
+
+        if chrm.bimodal_tex != [] and chrm.bimodal_ttr != []:
+            common = list(set(chrm.bimodal_tex).intersection(set(chrm.bimodal_ttr)))
+            common_variants = list()
+            for w in common:
+                common_variants += chrm.windows[w].variants
+            chrm.p_values['common_tex_ttr'] = scipy.stats.ks_2samp([v.tex for v in common_variants], [v.ttr for v in common_variants]).pvalue
+
+        if chrm.bimodal_tex != []:
+            bi_variants_tex = list()
+            for w in chrm.bimodal_tex:
+                bi_variants_tex += chrm.windows[w].variants
+            chrm.p_values['texGroup_tex_ttr_bimodal'] = scipy.stats.ks_2samp([v.tex for v in bi_variants_tex], [v.ttr for v in bi_variants_tex]).pvalue
+
+        if chrm.bimodal_ttr != []:
+            bi_variants_ttr = list()
+            for w in chrm.bimodal_ttr:
+                bi_variants_ttr += chrm.windows[w].variants
+            chrm.p_values['ttrGroup_tex_ttr_bimodal'] = scipy.stats.ks_2samp([v.tex for v in bi_variants_ttr], [v.ttr for v in bi_variants_ttr]).pvalue
+
+        #EMD
 
 
 if __name__ == '__main__':
