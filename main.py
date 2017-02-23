@@ -9,7 +9,7 @@ bonf_corr = 72*22*2
 sig_level = 0.05/bonf_corr
 vaf_list = ['nex', 'ntr', 'tex', 'ttr']
 EMD_ideal_tex = ['4555', '3367', '2575', '2080', '0100']
-EMD_ideal_ttr = ['01b', '01n', '5050']
+EMD_ideal_ttr = [ '5050', '01n', '01b']
 
 def main():
     chrm = find_window.assign_window(17, read_data.getAllVariants(), 'adaptive')
@@ -124,8 +124,21 @@ def main():
         #EMD
         for ideal_type in EMD_ideal_tex:
             ideal = emd.ideal_generator_tex(ideal_type)
-            chrm.emd_tex[ideal_type] = emd.emd(emd.cumsum(texGroup0_tex), emd.cumsum(ideal))
-        print chrm.emd_tex
+            chrm.emd_group0tex[ideal_type] = emd.emd(emd.cumsum(texGroup0_tex), emd.cumsum(ideal))
+
+        for ideal_type in EMD_ideal_tex:
+            ideal = emd.ideal_generator_tex(ideal_type)
+            chrm.emd_group1tex[ideal_type] = emd.emd(emd.cumsum(texGroup1_tex), emd.cumsum(ideal))
+
+        for ideal_type in EMD_ideal_ttr:
+            ideal = emd.ideal_generator_ttr(ideal_type)
+            chrm.emd_group0ttr[ideal_type] = emd.emd(emd.cumsum(ttrGroup0_ttr), emd.cumsum(ideal))
+        print chrm.emd_group0ttr
+
+        for ideal_type in EMD_ideal_ttr:
+            ideal = emd.ideal_generator_ttr(ideal_type)
+            chrm.emd_group1ttr[ideal_type] = emd.emd(emd.cumsum(ttrGroup1_ttr), emd.cumsum(ideal))
+        print chrm.emd_group1ttr
 
 if __name__ == '__main__':
     main()
