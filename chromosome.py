@@ -2,6 +2,7 @@ class chromosome:
     def __init__(self):
         self.windows = list()
         self.p_values = dict()
+        self.emd_tex = dict()
 
     def join_groups(self, vaf):
         group = [[], []]
