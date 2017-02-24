@@ -143,7 +143,8 @@ def main():
             ideal = emd.ideal_generator_ttr(ideal_type)
             chrm.emd_group1ttr[ideal_type] = emd.emd(emd.cumsum(ttrGroup1_ttr), emd.cumsum(ideal))
 
-        plot.plot_distribution_tex(texGroup1_tex)
-
+        # plot.plot_distribution_tex(texGroup1_tex)
+        texGroup1_ttr = [v.ttr for v in group_variants_tex[1]]
+        plot.plot_grid(texGroup1_tex, texGroup1_ttr)
 if __name__ == '__main__':
     main()

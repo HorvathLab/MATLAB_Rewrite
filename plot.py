@@ -1,6 +1,7 @@
 import numpy as np
 import emd
 import matplotlib.pyplot as plt
+from matplotlib.colors import LogNorm
 
 
 def plot_distribution_tex(sample):
@@ -22,15 +23,13 @@ def plot_distribution_tex(sample):
     ax2.hist(sample, bins, normed=0, histtype='bar', facecolor='b', rwidth=0.8, alpha=0.5, weights=np.ones_like(sample)/float(len(sample)))
 
     fig.tight_layout()
-    plt.show()
+    plt.savefig('samp_1_chrm_17_dis.png')
 
 
-def plot_grid():
-    fig, ax = plt.subplots()
-    grid = np.random.rand(4, 4)
-    ax.imshow(grid, interpolation=None, cmap='viridis')
-    ax.set_title(None)
+def plot_grid(x, y):
+    plt.hist2d(x, y, bins=np.linspace(0, 1, num=31))
     plt.show()
+
     return
 
 # plot_grid()
