@@ -11,6 +11,7 @@ def plot_distribution_tex(sample):
     ideal_2575 = emd.ideal_generator_tex('2575')
     ideal_2080 = emd.ideal_generator_tex('2080')
     bins = np.linspace(0, 1, num=31)
+    fig = plt.figure()
     fig, (ax0, ax1, ax2) = plt.subplots(nrows=3, figsize=(9, 9))
 
     ax0.hist(ideal_3367, bins, normed=0, histtype='bar', facecolor='r', rwidth=0.8, alpha=0.5, weights=np.ones_like(ideal_3367)/float(len(ideal_3367)))
@@ -24,12 +25,14 @@ def plot_distribution_tex(sample):
 
     fig.tight_layout()
     plt.savefig('samp_1_chrm_17_dis.png')
+    plt.figure()
+    return
 
 
 def plot_grid(x, y):
-    plt.hist2d(x, y, bins=np.linspace(0, 1, num=31))
-    plt.show()
-
+    fig2 = plt.hist2d(x, y, bins=np.linspace(0, 1, num=31))
+    plt.savefig('tex_ttr_bimodal.png')
+    plt.figure()
     return
 
 # plot_grid()
