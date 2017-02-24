@@ -4,6 +4,7 @@ import find_window
 import KS_test
 import scipy
 import emd
+import plot
 
 bonf_corr = 72*22*2
 sig_level = 0.05/bonf_corr
@@ -70,22 +71,24 @@ def main():
 
     if 'texGroup_tex_nex' in chrm.p_values.keys():
         if chrm.p_values['texGroup_tex_nex'] < sig_level:
-            chrm.bimodal = [x for x in range(len(chrm.windows))]
-            chrm.unimodal = []
+            chrm.bimodal_tex = [x for x in range(len(chrm.windows))]
+            chrm.unimodal_tex = []
         else:
-            chrm.unimodal = [x for x in range(len(chrm.windows))]
-            chrm.bimodal = []
+            chrm.unimodal_tex = [x for x in range(len(chrm.windows))]
+            chrm.bimodal_tex = []
     elif 'texGroup0_tex_nex' in chrm.p_values.keys() and 'texGroup1_tex_nex' in chrm.p_values.keys():
         grouping_tex = [w.group_tex for w in chrm.windows]
         chrm.bimodal_tex = list()
         chrm.unimodal_tex = list()
         if chrm.p_values['texGroup0_tex_nex'] < sig_level:
             chrm.bimodal_tex += [i for i,x in enumerate(grouping_tex) if x == 0]
+            chrm.bimodal['tex'].append(0)
         else:
             chrm.unimodal_tex += [i for i,x in enumerate(grouping_tex) if x == 0]
 
         if chrm.p_values['texGroup1_tex_nex'] < sig_level:
             chrm.bimodal_tex += [i for i,x in enumerate(grouping_tex) if x == 1]
+            chrm.bimodal['tex'].append(1)
         else:
             chrm.unimodal_tex += [i for i,x in enumerate(grouping_tex) if x == 1]
 
@@ -94,11 +97,13 @@ def main():
         chrm.unimodal_ttr = list()
         if chrm.p_values['ttrGroup0_ttr_ntr'] < sig_level:
             chrm.bimodal_ttr += [i for i,x in enumerate(grouping_ttr) if x == 0]
+            chrm.bimodal['ttr'].append(0)
         else:
             chrm.unimodal_ttr += [i for i,x in enumerate(grouping_ttr) if x == 0]
 
         if chrm.p_values['ttrGroup1_ttr_ntr'] < sig_level:
             chrm.bimodal_ttr += [i for i,x in enumerate(grouping_ttr) if x == 1]
+            chrm.bimodal['ttr'].append(1)
         else:
             chrm.unimodal_ttr += [i for i,x in enumerate(grouping_ttr) if x == 1]
 
@@ -133,12 +138,12 @@ def main():
         for ideal_type in EMD_ideal_ttr:
             ideal = emd.ideal_generator_ttr(ideal_type)
             chrm.emd_group0ttr[ideal_type] = emd.emd(emd.cumsum(ttrGroup0_ttr), emd.cumsum(ideal))
-        print chrm.emd_group0ttr
 
         for ideal_type in EMD_ideal_ttr:
             ideal = emd.ideal_generator_ttr(ideal_type)
             chrm.emd_group1ttr[ideal_type] = emd.emd(emd.cumsum(ttrGroup1_ttr), emd.cumsum(ideal))
-        print chrm.emd_group1ttr
+
+        plot.plot_distribution_tex(texGroup1_tex)
 
 if __name__ == '__main__':
     main()

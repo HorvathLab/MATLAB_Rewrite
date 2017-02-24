@@ -6,6 +6,7 @@ class chromosome:
         self.emd_group1tex = dict()
         self.emd_group0ttr = dict()
         self.emd_group1ttr = dict()
+        self.bimodal={'tex': [], 'ttr': []}
 
     def join_groups(self, vaf):
         group = [[], []]
@@ -18,7 +19,7 @@ class chromosome:
 
     def getAllVariants(self):
         allVariants = list()
-        for w in self.windows():
+        for w in self.windows:
             allVariants += w.variants
         return allVariants
 

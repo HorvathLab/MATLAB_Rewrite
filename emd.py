@@ -36,9 +36,7 @@ def ideal_generator_ttr(dis_type):
     elif dis_type == '5050':
         ideal = numpy.random.normal(0.5, 0.075, 20000)
         ideal = [k for k in ideal if abs(k - 0.5) < 0.5 ]
-    print len(ideal)
     return ideal
-
 
 def cumsum(data):
     counts = numpy.histogram(data, bins=bins, range=(0, 1))[0]
