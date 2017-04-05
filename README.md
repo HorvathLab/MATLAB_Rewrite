@@ -5,7 +5,7 @@ Some Descriptions
 Some Requirements
 
 ## Installation
-Some steps
+python setup.py install
 
 ## Usage
 All Parameters:

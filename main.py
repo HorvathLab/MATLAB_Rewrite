@@ -5,12 +5,12 @@ import KS_test
 import scipy
 import emd
 import plot
+import pdb
 
 bonf_corr = 72*22*2
 sig_level = 0.05/bonf_corr
 vaf_list = ['nex', 'ntr', 'tex', 'ttr']
-EMD_ideal_tex = ['4555', '3367', '2575', '2080', '0100']
-EMD_ideal_ttr = [ '5050', '01n', '01b']
+EMD_ideal = [(51 + x) * 0.01 for x in range(50)]
 
 def main():
     chrm = find_window.assign_window(17, read_data.getAllVariants(), 'adaptive')
@@ -127,34 +127,48 @@ def main():
             chrm.p_values['ttrGroup_tex_ttr_bimodal'] = scipy.stats.ks_2samp([v.tex for v in bi_variants_ttr], [v.ttr for v in bi_variants_ttr]).pvalue
 
         #EMD
-        for ideal_type in EMD_ideal_tex:
-            ideal = emd.ideal_generator_tex(ideal_type)
-            chrm.emd_group0tex[ideal_type] = emd.emd(emd.cumsum(texGroup0_tex), emd.cumsum(ideal))
+        EMD = list()
+        for ideal_type in EMD_ideal:
+            ideal = emd.ideal_generator(ideal_type)
+            EMD.append(emd.emd(emd.cumsum(texGroup0_tex), emd.cumsum(ideal)))
+        chrm.emd_group0tex = EMD.index(min(EMD)) + 51
 
-        for ideal_type in EMD_ideal_tex:
-            ideal = emd.ideal_generator_tex(ideal_type)
-            chrm.emd_group1tex[ideal_type] = emd.emd(emd.cumsum(texGroup1_tex), emd.cumsum(ideal))
+        EMD = list()
+        for ideal_type in EMD_ideal:
+            ideal = emd.ideal_generator(ideal_type)
+            EMD.append(emd.emd(emd.cumsum(texGroup1_tex), emd.cumsum(ideal)))
+        chrm.emd_group1tex = EMD.index(min(EMD)) + 51
 
-        for ideal_type in EMD_ideal_ttr:
-            ideal = emd.ideal_generator_ttr(ideal_type)
-            chrm.emd_group0ttr[ideal_type] = emd.emd(emd.cumsum(ttrGroup0_ttr), emd.cumsum(ideal))
+        EMD = list()
+        for ideal_type in EMD_ideal:
+            ideal = emd.ideal_generator(ideal_type)
+            EMD.append(emd.emd(emd.cumsum(ttrGroup0_ttr), emd.cumsum(ideal)))
+            chrm.emd_group0ttr = EMD.index(min(EMD)) + 51
 
-        for ideal_type in EMD_ideal_ttr:
-            ideal = emd.ideal_generator_ttr(ideal_type)
-            chrm.emd_group1ttr[ideal_type] = emd.emd(emd.cumsum(ttrGroup1_ttr), emd.cumsum(ideal))
+        EMD = list()
+        for ideal_type in EMD_ideal:
+            ideal = emd.ideal_generator(ideal_type)
+            EMD.append(emd.emd(emd.cumsum(ttrGroup1_ttr), emd.cumsum(ideal)))
+            chrm.emd_group1ttr = EMD.index(min(EMD)) + 51
 
         result = open('result.txt', 'w')
         features = ['p_values', 'emd_group0tex', 'emd_group0ttr', 'emd_group1tex', 'emd_group1ttr']
-        for f in features:
-            result.write(f + '\n')
-            chrm_feature = getattr(chrm, f)
-            print chrm_feature
-            for k in chrm_feature.keys():
-                result.write(k + ': %f\n' % chrm_feature[k])
-        result.close()
+        print chrm.emd_group0tex
+        print chrm.emd_group1tex
+        print chrm.emd_group0ttr
+        print chrm.emd_group1ttr
 
-        plot.plot_distribution_tex(texGroup1_tex)
-        texGroup1_ttr = [v.ttr for v in group_variants_tex[1]]
-        plot.plot_grid(texGroup1_ttr, texGroup1_tex)
+        # for f in features:
+        #     result.write(f + '\n')
+        #     chrm_feature = getattr(chrm, f)
+        #     for k in chrm_feature.keys():
+        #         result.write(str(k) + ': %f\n' % chrm_feature[k])
+        # result.close()
+
+        # plot.plot_distribution_tex(texGroup1_tex)
+        # texGroup1_ttr = [v.ttr for v in group_variants_tex[1]]
+        # plot.plot_grid(texGroup1_ttr, texGroup1_tex)
+
+
 if __name__ == '__main__':
     main()
