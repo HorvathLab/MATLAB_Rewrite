@@ -7,6 +7,7 @@ class chromosome:
         self.emd_group0ttr = dict()
         self.emd_group1ttr = dict()
         self.bimodal={'tex': [], 'ttr': []}
+        self.group=list()
 
     def join_groups(self, vaf):
         group = [[], []]
@@ -17,15 +18,28 @@ class chromosome:
                 group[1] += w.variants
         return group
 
+    def join_windows(self, index1, index2):
+        self.windows[index1].variants += self.windows[index2].variants
+        self.windows[index2].variants = list()
+        self.windows[index1].group.update([index1, index2])
+        self.windows[index1].group.update(self.windows[index2].group)
+        self.windows[index2].group = set()
+
     def getAllVariants(self):
         allVariants = list()
         for w in self.windows:
             allVariants += w.variants
         return allVariants
 
+    def get_variants_number(self):
+        for w in self.windows:
+            w.var_num = len(w.variants)
+
 class window:
     def __init__(self):
         self.variants = list()
+        self.group = set()
+        self.close_emd = None
 
 class variant:
     def __init__(self, chrm, pos, ref, alt, nex, ntr, tex, ttr):

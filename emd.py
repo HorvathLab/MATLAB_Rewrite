@@ -1,7 +1,9 @@
 import numpy
 
-bins = 100
-max_emd = 1
+max_emd = 0.5
+num_bins = 101
+bins = numpy.linspace(0, 0.5, num=num_bins)
+bin_width = bins[2] - bins[1]
 
 def ideal_generator(dis_type):
     mu_small = 1 - dis_type
@@ -13,11 +15,14 @@ def ideal_generator(dis_type):
     return ideal
 
 def cumsum(data):
-    counts = numpy.histogram(data, bins=bins, range=(0, 1))[0]
-    length = len(data)
-    return numpy.cumsum([float(h)/length for h in counts])
+    if data:
+        counts = numpy.histogram(data, bins=bins)[0]
+        length = len(data)
+        return numpy.cumsum([float(h)/length for h in counts])
+    # else:
+    #     raise RuntimeError
 
-def emd(sample, ideal):
-    sub = [abs(x - y) for x, y in zip(sample, ideal)]
-    emd = sum(sub) * (1 / float(bins)) / float(max_emd)
+def emd(sample1, sample2):
+    sub = [abs(x - y) for x, y in zip(sample1, sample2)]
+    emd = sum(sub) * bin_width / float(max_emd)
     return emd
