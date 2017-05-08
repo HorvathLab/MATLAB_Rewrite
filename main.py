@@ -10,7 +10,10 @@ import pdb
 bonf_corr = 72*22*2
 sig_level = 0.05/bonf_corr
 vaf_list = ['nex', 'ntr', 'tex', 'ttr']
+bonf_corr
+
 EMD_ideal = [(51 + x) * 0.01 for x in range(50)]
+EMD_ideal
 
 def main():
     chrm = find_window.assign_window(17, read_data.getAllVariants(), 'adaptive')

@@ -37,17 +37,5 @@ def plot_grid(x, y):
     plt.figure()
     return
 
-
-def plot_chrm(chrm):
-    allVariants = chrm.getAllVariants()
-    pos = [v.pos for v in allVariants]
-    tex = [v.tex for v in allVariants]
-    ttr = [v.ttr for v in allVariants]
-    fig = plt.figure()
-    plt.scatter(pos, tex, c='red', s=0.5, alpha=1)
-    plt.scatter(pos, ttr, c='orange', s=0.5, alpha=1)
-    plt.show()
-
-
 # chrm = find_window.assign_window(17, read_data.getAllVariants(), 'adaptive')
 # plot_chrm(chrm)

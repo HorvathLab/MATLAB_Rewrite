@@ -1,7 +1,8 @@
 import chromosome
 
 method = 'adaptive'
-number_of_wdw = 10
+number_of_wdw = 20
+number_of_wdw_bp = 200
 chrm_len = [249250621, 243199373, 198022430, 191154276, 180915260, 171115067,
             159138663, 146364022, 141213431, 135534747, 135006516, 133851895,
             115169878, 107349540, 102531392, 90354753, 81195210, 78077248,
@@ -15,7 +16,7 @@ def position_window(chrm_variants_num):
 def data_window(chrom, allVariants):
     start_pos = min([v.pos for v in allVariants])
     end_pos = max([v.pos for v in allVariants])
-    segment_length = round(chrm_len[chrom - 1] / number_of_wdw)
+    segment_length = round(chrm_len[chrom - 1] / number_of_wdw_bp)
     wdw_variants_num = list()
 
     pos = start_pos
@@ -27,25 +28,27 @@ def data_window(chrom, allVariants):
     return wdw_variants_num
 
 def adaptive_window(chrom, allVariants):
-    chrm_variants_num = len(allVariants) // number_of_wdw
+    chrm_variants_num = len(allVariants) // number_of_wdw + 1
     data_wdw_variants_num = data_window(chrom, allVariants)
     wdw_variants_num = list()
     i = 0
-    while i < number_of_wdw:
+    while i < number_of_wdw_bp:
         if wdw_variants_num and wdw_variants_num[-1] < chrm_variants_num:
-            wdw_variants_num[-1] += data_wdw_variants_num[i]
-            i += 1
+            if i != number_of_wdw_bp - 1:
+                wdw_variants_num[-1] += data_wdw_variants_num[i]
+                i += 1
+            else:
+                 wdw_variants_num[-2] += wdw_variants_num[-1] + data_wdw_variants_num[i]
+                 wdw_variants_num.pop(-1)
+                 i += 1
         else:
             if data_wdw_variants_num[i] < chrm_variants_num:
-                if i != number_of_wdw - 1:
-                    wdw_variants_num.append(data_wdw_variants_num[i] + data_wdw_variants_num[i + 1])
-                    i += 2
-                elif i == number_of_wdw - 1:
-                    wdw_variants_num[-1] += data_wdw_variants_num[i]
-                    i += 1
+                wdw_variants_num.append(data_wdw_variants_num[i] + data_wdw_variants_num[i + 1])
+                i += 2                   
             else:
                 wdw_variants_num.append(data_wdw_variants_num[i])
                 i += 1
+
     return wdw_variants_num
 
 def assign_window(chrom, allVariants, type):
